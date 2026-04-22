@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="24节气 - 传统文化智慧，实时节气查询与倒计时">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="24节气">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+
+  <title>24节气</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #FFFFFF;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 30px;
+    }
+
+    .app-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+
+    .current-term {
+      font-size: clamp(48px, 15vw, 80px);
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.2;
+      margin-bottom: 15px;
+    }
+
+    .term-date-range {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 30px;
+    }
+
+    .info-section {
+      background: #f8f8f8;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .countdown-section {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .countdown-label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .countdown-number {
+      font-size: clamp(36px, 10vw, 56px);
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .countdown-unit {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .poem-section {
+      margin-top: auto;
+      padding: 30px 20px;
+      text-align: center;
+      border-top: 1px solid #e8e8e8;
+    }
+
+    .poem-content {
+      font-family: "Georgia", "Times New Roman", "Songti SC", "SimSun", serif;
+      font-size: 18px;
+      line-height: 1.8;
+      color: #444;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .poem-source {
+      font-size: 14px;
+      color: #999;
+      font-style: normal;
+    }
+
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 1000;
+    }
+
+    .install-prompt.show {
+      display: block;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+
+      header {
+        padding: 30px 15px 20px;
+      }
+
+      .current-term {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="app-title">二十四节气</div>
+      <div class="current-term" id="currentTerm">加载中...</div>
+      <div class="term-date-range" id="termDateRange"></div>
+    </header>
+
+    <section class="info-section">
+      <div class="info-row">
+        <span class="info-label">上一个节气</span>
+        <span class="info-value" id="prevTerm">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">当前节气</span>
+        <span class="info-value" id="currentTermInfo">-</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">下一个节气</span>
+        <span class="info-value" id="nextTerm">-</span>
+      </div>
+    </section>
+
+    <section class="countdown-section">
+      <div class="countdown-label">距离下一个节气还有</div>
+      <div class="countdown-number" id="countdown">-</div>
+      <div class="countdown-unit">天</div>
+    </section>
+
+    <section class="poem-section">
+      <div class="poem-content" id="poemContent">加载中...</div>
+      <div class="poem-source" id="poemSource"></div>
+    </section>
+  </div>
+
+  <div class="install-prompt" id="installPrompt">添加到桌面</div>
+
+  <script>
+    // 24节气数据（2026年）
+    const solarTerms = [
+      { name: "立春", date: "2026-02-04", poem: "东风解冻，蛰虫始振", source: "《月令七十二候集解》" },
+      { name: "雨水", date: "2026-02-19", poem: "好雨知时节，当春乃发生", source: "杜甫《春夜喜雨》" },
+      { name: "惊蛰", date: "2026-03-06", poem: "微雨众卉新，一雷惊蛰始", source: "韦应物《观田家》" },
+      { name: "春分", date: "2026-03-21", poem: "春分雨脚落声微，柳岸斜风带客归", source: "宋·徐铉" },
+      { name: "清明", date: "2026-04-05", poem: "清明时节雨纷纷，路上行人欲断魂", source: "杜牧《清明》" },
+      { name: "谷雨", date: "2026-04-20", poem: "谷雨如丝复似尘，煮瓶浮蜡正尝新", source: "范成大《晚春田园杂兴》" },
+      { name: "立夏", date: "2026-05-06", poem: "绿树阴浓夏日长，楼台倒影入池塘", source: "高骈《山亭夏日》" },
+      { name: "小满", date: "2026-05-21", poem: "夜莺啼绿柳，皓月醒长空", source: "欧阳修《小满》" },
+      { name: "芒种", date: "2026-06-06", poem: "家家麦色美，处处梅子黄", source: "陆游《时雨》" },
+      { name: "夏至", date: "2026-06-21", poem: "东边日出西边雨，道是无晴却有晴", source: "刘禹锡《竹枝词》" },
+      { name: "小暑", date: "2026-07-07", poem: "荷风送香气，竹露滴清响", source: "孟浩然《夏日南亭怀辛大》" },
+      { name: "大暑", date: "2026-07-23", poem: "赤日几时过，清风无处寻", source: "宋代《大暑》" },
+      { name: "立秋", date: "2026-08-08", poem: "空山新雨后，天气晚来秋", source: "王维《山居秋暝》" },
+      { name: "处暑", date: "2026-08-23", poem: "离离原上草，一岁一枯荣", source: "白居易《赋得古原草送别》" },
+      { name: "白露", date: "2026-09-08", poem: "露从今夜白，月是故乡明", source: "杜甫《月夜忆舍弟》" },
+      { name: "秋分", date: "2026-09-23", poem: "秋风起兮白云飞，草木黄落兮雁南归", source: "刘彻《秋风辞》" },
+      { name: "寒露", date: "2026-10-08", poem: "萧疏桐叶上，月白露初团", source: "唐·戴察" },
+      { name: "霜降", date: "2026-10-24", poem: "月落乌啼霜满天，江枫渔火对愁眠", source: "张继《枫桥夜泊》" },
+      { name: "立冬", date: "2026-11-08", poem: "冻云新泛白，衰叶半成黄", source: "陆游《立冬日作》" },
+      { name: "小雪", date: "2026-11-22", poem: "花雪随风不厌看，更多还肯失林峦", source: "戴叔伦《小雪》" },
+      { name: "大雪", date: "2026-12-07", poem: "晚来天欲雪，能饮一杯无", source: "白居易《问刘十九》" },
+      { name: "冬至", date: "2026-12-22", poem: "天时人事日相催，冬至阳生春又来", source: "杜甫《小至》" },
+      { name: "小寒", date: "2027-01-06", poem: "小寒连大吕，欢鹊垒新巢", source: "元·吴澄" },
+      { name: "大寒", date: "2027-01-20", poem: "旧雪未及消，新雪又拥户", source: "邵雍《大寒》" }
+    ];
+
+    // 计算当前日期所在的节气
+    function getCurrentTerm() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      for (let i = 0; i < solarTerms.length; i++) {
+        const termDate = new Date(solarTerms[i].date);
+        termDate.setHours(0, 0, 0, 0);
+
+        const nextTermIndex = (i + 1) % solarTerms.length;
+        const nextTermDate = new Date(solarTerms[nextTermIndex].date);
+        nextTermDate.setHours(0, 0, 0, 0);
+
+        if (today >= termDate && today < nextTermDate) {
+          return {
+            current: solarTerms[i],
+            next: solarTerms[nextTermIndex],
+            prev: solarTerms[(i - 1 + solarTerms.length) % solarTerms.length],
+            currentIndex: i
+          };
+        }
+      }
+
+      return null;
+    }
+
+    // 格式化日期显示
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      return `${month}月${day}日`;
+    }
+
+    // 计算天数差
+    function daysBetween(date1, date2) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      return Math.round((date2 - date1) / oneDay);
+    }
+
+    // 更新页面内容
+    function updateDisplay() {
+      const termInfo = getCurrentTerm();
+
+      if (!termInfo) {
+        document.getElementById('currentTerm').textContent = '数据加载中';
+        return;
+      }
+
+      const { current, next, prev } = termInfo;
+
+      // 更新当前节气
+      document.getElementById('currentTerm').textContent = current.name;
+
+      // 计算节气日期范围
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startDate = new Date(current.date);
+      const endDate = new Date(next.date);
+      endDate.setDate(endDate.getDate() - 1);
+
+      document.getElementById('termDateRange').textContent =
+        `${formatDate(current.date)} - ${formatDate(endDate)}`;
+
+      // 更新信息区域
+      document.getElementById('prevTerm').textContent = prev.name;
+      document.getElementById('currentTermInfo').textContent = current.name;
+      document.getElementById('nextTerm').textContent = next.name;
+
+      // 计算倒计时
+      const daysLeft = daysBetween(today, new Date(next.date));
+      document.getElementById('countdown').textContent = daysLeft;
+
+      // 更新诗词
+      document.getElementById('poemContent').textContent = current.poem;
+      document.getElementById('poemSource').textContent = current.source;
+    }
+
+    // 添加到桌面提示
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPrompt.classList.add('show');
+    });
+
+    installPrompt.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        installPrompt.classList.remove('show');
+      }
+    });
+
+    // 初始化
+    updateDisplay();
+
+    // 每分钟更新一次倒计时
+    setInterval(updateDisplay, 60000);
+
+    // 注册 Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(() => {
+        console.log('Service Worker 注册成功');
+      }).catch((err) => {
+        console.log('Service Worker 注册失败:', err);
+      });
+    }
+  </script>
+</body>
+</html>

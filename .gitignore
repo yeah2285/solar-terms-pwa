@@ -1,0 +1,16 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Optional: 如果不想提交生成的图标
+# icons/*.png
