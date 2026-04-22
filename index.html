@@ -55,7 +55,7 @@
     .app-title {
       font-size: 18px;
       font-weight: 500;
-      color: #666;
+      color: #C41E3A;
       margin-bottom: 10px;
       letter-spacing: 2px;
     }
@@ -128,6 +128,74 @@
     .countdown-unit {
       font-size: 16px;
       opacity: 0.9;
+    }
+
+    .progress-section {
+      background: #f8f8f8;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-label {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .progress-days {
+      font-size: 14px;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e8e8e8;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .knowledge-section {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .knowledge-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .knowledge-title::before {
+      content: "📖";
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    .knowledge-content {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #444;
     }
 
     .poem-section {
@@ -216,6 +284,21 @@
       <div class="countdown-unit">天</div>
     </section>
 
+    <section class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">当前节气进度</span>
+        <span class="progress-days" id="progressDays">已过 0 天 / 共 15 天</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </section>
+
+    <section class="knowledge-section">
+      <div class="knowledge-title">节气知识</div>
+      <div class="knowledge-content" id="knowledgeContent">加载中...</div>
+    </section>
+
     <section class="poem-section">
       <div class="poem-content" id="poemContent">加载中...</div>
       <div class="poem-source" id="poemSource"></div>
@@ -227,30 +310,174 @@
   <script>
     // 24节气数据（2026年）
     const solarTerms = [
-      { name: "立春", date: "2026-02-04", poem: "东风解冻，蛰虫始振", source: "《月令七十二候集解》" },
-      { name: "雨水", date: "2026-02-19", poem: "好雨知时节，当春乃发生", source: "杜甫《春夜喜雨》" },
-      { name: "惊蛰", date: "2026-03-06", poem: "微雨众卉新，一雷惊蛰始", source: "韦应物《观田家》" },
-      { name: "春分", date: "2026-03-21", poem: "春分雨脚落声微，柳岸斜风带客归", source: "宋·徐铉" },
-      { name: "清明", date: "2026-04-05", poem: "清明时节雨纷纷，路上行人欲断魂", source: "杜牧《清明》" },
-      { name: "谷雨", date: "2026-04-20", poem: "谷雨如丝复似尘，煮瓶浮蜡正尝新", source: "范成大《晚春田园杂兴》" },
-      { name: "立夏", date: "2026-05-06", poem: "绿树阴浓夏日长，楼台倒影入池塘", source: "高骈《山亭夏日》" },
-      { name: "小满", date: "2026-05-21", poem: "夜莺啼绿柳，皓月醒长空", source: "欧阳修《小满》" },
-      { name: "芒种", date: "2026-06-06", poem: "家家麦色美，处处梅子黄", source: "陆游《时雨》" },
-      { name: "夏至", date: "2026-06-21", poem: "东边日出西边雨，道是无晴却有晴", source: "刘禹锡《竹枝词》" },
-      { name: "小暑", date: "2026-07-07", poem: "荷风送香气，竹露滴清响", source: "孟浩然《夏日南亭怀辛大》" },
-      { name: "大暑", date: "2026-07-23", poem: "赤日几时过，清风无处寻", source: "宋代《大暑》" },
-      { name: "立秋", date: "2026-08-08", poem: "空山新雨后，天气晚来秋", source: "王维《山居秋暝》" },
-      { name: "处暑", date: "2026-08-23", poem: "离离原上草，一岁一枯荣", source: "白居易《赋得古原草送别》" },
-      { name: "白露", date: "2026-09-08", poem: "露从今夜白，月是故乡明", source: "杜甫《月夜忆舍弟》" },
-      { name: "秋分", date: "2026-09-23", poem: "秋风起兮白云飞，草木黄落兮雁南归", source: "刘彻《秋风辞》" },
-      { name: "寒露", date: "2026-10-08", poem: "萧疏桐叶上，月白露初团", source: "唐·戴察" },
-      { name: "霜降", date: "2026-10-24", poem: "月落乌啼霜满天，江枫渔火对愁眠", source: "张继《枫桥夜泊》" },
-      { name: "立冬", date: "2026-11-08", poem: "冻云新泛白，衰叶半成黄", source: "陆游《立冬日作》" },
-      { name: "小雪", date: "2026-11-22", poem: "花雪随风不厌看，更多还肯失林峦", source: "戴叔伦《小雪》" },
-      { name: "大雪", date: "2026-12-07", poem: "晚来天欲雪，能饮一杯无", source: "白居易《问刘十九》" },
-      { name: "冬至", date: "2026-12-22", poem: "天时人事日相催，冬至阳生春又来", source: "杜甫《小至》" },
-      { name: "小寒", date: "2027-01-06", poem: "小寒连大吕，欢鹊垒新巢", source: "元·吴澄" },
-      { name: "大寒", date: "2027-01-20", poem: "旧雪未及消，新雪又拥户", source: "邵雍《大寒》" }
+      {
+        name: "立春",
+        date: "2026-02-04",
+        poem: "东风解冻，蛰虫始振",
+        source: "《月令七十二候集解》",
+        knowledge: "立春是二十四节气之首，标志着春季的开始。此时阳气上升，万物复苏。传统习俗有咬春（吃萝卜）、春游等。养生方面要注意保暖，适当运动，增强体质。"
+      },
+      {
+        name: "雨水",
+        date: "2026-02-19",
+        poem: "好雨知时节，当春乃发生",
+        source: "杜甫《春夜喜雨》",
+        knowledge: "雨水节气表示降雨开始，雨量增多。此时气温回升，冰雪融化。传统有'回娘家'的习俗。养生要注意健脾祛湿，可多吃山药、红枣等食物。"
+      },
+      {
+        name: "惊蛰",
+        date: "2026-03-06",
+        poem: "微雨众卉新，一雷惊蛰始",
+        source: "韦应物《观田家》",
+        knowledge: "惊蛰时节春雷乍动，惊醒蛰伏的昆虫。此时天气转暖，春耕开始。民间有吃梨的习俗，寓意远离疾病。养生要养肝护肝，保持心情舒畅。"
+      },
+      {
+        name: "春分",
+        date: "2026-03-21",
+        poem: "春分雨脚落声微，柳岸斜风带客归",
+        source: "宋·徐铉",
+        knowledge: "春分是春季的中分点，昼夜平分。此时气候温和，雨水充沛。传统有竖蛋、吃春菜等习俗。养生要注意阴阳平衡，保持规律作息。"
+      },
+      {
+        name: "清明",
+        date: "2026-04-05",
+        poem: "清明时节雨纷纷，路上行人欲断魂",
+        source: "杜牧《清明》",
+        knowledge: "清明是自然节令与传统节日的重要时刻。此时天气清爽明媚，适合踏青郊游。传统习俗有扫墓祭祖、踏青、放风筝等。养生要注意调节情绪，适度运动。"
+      },
+      {
+        name: "谷雨",
+        date: "2026-04-20",
+        poem: "谷雨如丝复似尘，煮瓶浮蜡正尝新",
+        source: "范成大《晚春田园杂兴》",
+        knowledge: "谷雨是春季最后一个节气，雨水增多，利于谷物生长。民间有喝谷雨茶的习俗。养生要健脾祛湿，可食用红豆薏米粥。"
+      },
+      {
+        name: "立夏",
+        date: "2026-05-06",
+        poem: "绿树阴浓夏日长，楼台倒影入池塘",
+        source: "高骈《山亭夏日》",
+        knowledge: "立夏标志着夏季的开始，万物繁茂。传统有称体重、吃蛋等习俗。养生要养心为主，保持心静，可适当吃些苦瓜清热。"
+      },
+      {
+        name: "小满",
+        date: "2026-05-21",
+        poem: "夜莺啼绿柳，皓月醒长空",
+        source: "欧阳修《小满》",
+        knowledge: "小满表示夏熟作物的籽粒开始灌浆饱满，但还未成熟。此时气温明显升高。养生要注意防暑降温，多喝水，饮食清淡。"
+      },
+      {
+        name: "芒种",
+        date: "2026-06-06",
+        poem: "家家麦色美，处处梅子黄",
+        source: "陆游《时雨》",
+        knowledge: "芒种是种植农作物的繁忙时节，有'芒种'之意。此时长江中下游地区进入梅雨季节。养生要注意防湿，可食用生姜、薏米等祛湿食物。"
+      },
+      {
+        name: "夏至",
+        date: "2026-06-21",
+        poem: "东边日出西边雨，道是无晴却有晴",
+        source: "刘禹锡《竹枝词》",
+        knowledge: "夏至是全年中白天最长的一天，阳气最盛。传统有吃夏至面、祭祖等习俗。养生要注意养心防暑，适当午休，保持心态平和。"
+      },
+      {
+        name: "小暑",
+        date: "2026-07-07",
+        poem: "荷风送香气，竹露滴清响",
+        source: "孟浩然《夏日南亭怀辛大》",
+        knowledge: "小暑标志着季夏时节的开始，天气逐渐炎热。民间有吃藕、晒书画等习俗。养生要注意清热解暑，多喝绿豆汤，避免长时间在烈日下活动。"
+      },
+      {
+        name: "大暑",
+        date: "2026-07-23",
+        poem: "赤日几时过，清风无处寻",
+        source: "宋代《大暑》",
+        knowledge: "大暑是一年中最热的时期，高温高湿。传统有喝伏茶、晒伏姜等习俗。养生要特别注意防暑降温，多饮水，饮食宜清淡，可适当食用西瓜、苦瓜等清热食物。"
+      },
+      {
+        name: "立秋",
+        date: "2026-08-08",
+        poem: "空山新雨后，天气晚来秋",
+        source: "王维《山居秋暝》",
+        knowledge: "立秋是秋季的开始，暑去凉来。传统有贴秋膘、吃瓜等习俗。养生要注意润燥养肺，可食用梨、百合、银耳等润肺食物。"
+      },
+      {
+        name: "处暑",
+        date: "2026-08-23",
+        poem: "离离原上草，一岁一枯荣",
+        source: "白居易《赋得古原草送别》",
+        knowledge: "处暑表示炎热的暑天即将结束，气温逐渐下降。此时秋高气爽，适合出游。养生要注意调整作息，早睡早起，适当增减衣物。"
+      },
+      {
+        name: "白露",
+        date: "2026-09-08",
+        poem: "露从今夜白，月是故乡明",
+        source: "杜甫《月夜忆舍弟》",
+        knowledge: "白露时节天气转凉，夜间水汽凝结成露。传统有喝白露茶、吃龙眼的习俗。养生要注意保暖，特别是腹部和脚部，可食用核桃、莲子等温补食物。"
+      },
+      {
+        name: "秋分",
+        date: "2026-09-23",
+        poem: "秋风起兮白云飞，草木黄落兮雁南归",
+        source: "刘彻《秋风辞》",
+        knowledge: "秋分是秋季的中分点，再次昼夜平分。此时秋高气爽，是赏菊的好时节。养生要注意平衡阴阳，可适当食用银耳、梨等润燥食物。"
+      },
+      {
+        name: "寒露",
+        date: "2026-10-08",
+        poem: "萧疏桐叶上，月白露初团",
+        source: "唐·戴察",
+        knowledge: "寒露时节气温更低，露水更冷，即将凝结成霜。传统有赏菊花、登高等习俗。养生要注意防寒保暖，特别是足部，可适当食用生姜、红枣等温补食物。"
+      },
+      {
+        name: "霜降",
+        date: "2026-10-24",
+        poem: "月落乌啼霜满天，江枫渔火对愁眠",
+        source: "张继《枫桥夜泊》",
+        knowledge: "霜降是秋季最后一个节气，天气渐冷，开始有霜。民间有吃柿子、赏红叶等习俗。养生要注意保暖，可适当食用羊肉、栗子等温补食物。"
+      },
+      {
+        name: "立冬",
+        date: "2026-11-08",
+        poem: "冻云新泛白，衰叶半成黄",
+        source: "陆游《立冬日作》",
+        knowledge: "立冬标志着冬季的开始，万物收藏。传统有吃饺子、炖汤等习俗。养生要注意保暖，养肾为主，可适当食用黑豆、黑芝麻等补肾食物。"
+      },
+      {
+        name: "小雪",
+        date: "2026-11-22",
+        poem: "花雪随风不厌看，更多还肯失林峦",
+        source: "戴叔伦《小雪》",
+        knowledge: "小雪时节气温下降，开始降雪。民间有腌制腊肉、吃糍粑等习俗。养生要注意防寒保暖，可适当食用羊肉、牛肉等温热食物。"
+      },
+      {
+        name: "大雪",
+        date: "2026-12-07",
+        poem: "晚来天欲雪，能饮一杯无",
+        source: "白居易《问刘十九》",
+        knowledge: "大雪是冬季的第三个节气，天气更冷，降雪可能性更大。传统有赏雪景、吃红薯的习俗。养生要注意保暖防寒，可适当食用生姜、桂圆等温补食物。"
+      },
+      {
+        name: "冬至",
+        date: "2026-12-22",
+        poem: "天时人事日相催，冬至阳生春又来",
+        source: "杜甫《小至》",
+        knowledge: "冬至是全年中白天最短的一天，也是重要传统节日。传统有吃饺子、汤圆、祭祖等习俗。养生要注意护阳温肾，可适当食用羊肉、韭菜等温补食物。"
+      },
+      {
+        name: "小寒",
+        date: "2027-01-06",
+        poem: "小寒连大吕，欢鹊垒新巢",
+        source: "元·吴澄",
+        knowledge: "小寒是冬季的第五个节气，标志着进入一年中最寒冷的时期。传统有喝腊八粥、吃腊八蒜等习俗。养生要注意防寒保暖，可适当食用红枣、桂圆等温补食物。"
+      },
+      {
+        name: "大寒",
+        date: "2027-01-20",
+        poem: "旧雪未及消，新雪又拥户",
+        source: "邵雍《大寒》",
+        knowledge: "大寒是全年最后一个节气，天气寒冷到极点。传统有扫尘、准备年货等习俗。养生要注意保暖，为即将到来的春天做好准备，可适当食用山药、莲子等健脾食物。"
+      }
     ];
 
     // 计算当前日期所在的节气
@@ -325,6 +552,22 @@
       // 计算倒计时
       const daysLeft = daysBetween(today, new Date(next.date));
       document.getElementById('countdown').textContent = daysLeft;
+
+      // 计算进度条
+      const daysPassed = daysBetween(new Date(current.date), today) + 1; // +1包含当天
+      const totalDays = daysBetween(new Date(current.date), new Date(next.date));
+      const progressPercent = Math.min(100, Math.max(0, (daysPassed / totalDays) * 100));
+
+      document.getElementById('progressDays').textContent =
+        `已过 ${daysPassed} 天 / 共 ${totalDays} 天`;
+      document.getElementById('progressFill').style.width = `${progressPercent}%`;
+
+      // 更新节气知识
+      if (current.knowledge) {
+        document.getElementById('knowledgeContent').textContent = current.knowledge;
+      } else {
+        document.getElementById('knowledgeContent').textContent = '暂无相关知识';
+      }
 
       // 更新诗词
       document.getElementById('poemContent').textContent = current.poem;
